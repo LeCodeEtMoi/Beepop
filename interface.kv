@@ -1,0 +1,120 @@
+#:kivy 2.3.0
+
+<RootWidget>:
+    orientation: 'vertical'
+    padding: dp(10)
+    spacing: dp(10)
+    canvas.before:
+        Color:
+            rgba: 0.16, 0.16, 0.21, 1
+        Rectangle:
+            pos: self.pos
+            size: self.size
+
+    # --------------------------------------------------------------
+    # Piste courante
+    # --------------------------------------------------------------
+    Label:
+        id: current_track
+        text: app.player.current_track_text
+        color: 0.97, 0.97, 0.95, 1
+        size_hint_y: None
+        height: dp(40)
+        font_size: sp(18)
+
+    # --------------------------------------------------------------
+    # Visualisation (onde + spectre)
+    # --------------------------------------------------------------
+    VisualizerCanvas:
+        id: visualizer
+        size_hint_y: 0.3
+
+    # --------------------------------------------------------------
+    # Barre de progression + temps
+    # --------------------------------------------------------------
+    BoxLayout:
+        size_hint_y: None
+        height: dp(30)
+        spacing: dp(5)
+
+        Label:
+            id: elapsed
+            text: "{:02d}:{:02d}".format(int(app.player.position) // 60,int(app.player.position) % 60)
+            size_hint_x: None
+            width: dp(50)
+            color: 0.8, 0.8, 0.8, 1
+
+        Slider:
+            id: progress_slider
+            min: 0
+            max: app.player.duration if app.player.duration else 1
+            value: app.player.position
+            on_touch_up:
+                if self.collide_point(*args[1].pos):app.player.seek(self.value)
+
+        Label:
+            id: total
+            text: "{:02d}:{:02d}".format(int(app.player.duration) // 60,int(app.player.duration) % 60)
+            size_hint_x: None
+            width: dp(50)
+            color: 0.8, 0.8, 0.8, 1
+
+    # --------------------------------------------------------------
+    # Contrôles principaux
+    # --------------------------------------------------------------
+    BoxLayout:
+        size_hint_y: None
+        height: dp(60)
+        spacing: dp(10)
+
+        Button:
+            text: "⏮ Prev"
+            on_release: app.prev()
+        Button:
+            text: "⏯ Play/Pause"
+            on_release: app.toggle_play()
+        Button:
+            text: "⏭ Next"
+            on_release: app.next()
+        Button:
+            text: "⏹ Stop"
+            on_release: app.stop()
+
+    # --------------------------------------------------------------
+    # Options supplémentaires (repeat, shuffle, volume)
+    # --------------------------------------------------------------
+    BoxLayout:
+        size_hint_y: None
+        height: dp(50)
+        spacing: dp(10)
+
+        # Repeat mode (cycle)
+        Button:
+            id: repeat_btn
+            text: {"none":"🔁 Off","single":"🔂 One","all":"🔁 All"}[app.player.repeat_mode]
+            on_release: app.cycle_repeat()
+
+        # Shuffle
+        ToggleButton:
+            id: shuffle_btn
+            text: "🔀 Shuffle"
+            state: "down" if app.player.shuffle else "normal"
+            on_state:
+                app.toggle_shuffle(self.state == "down")
+
+        # Volume + mute
+        BoxLayout:
+            orientation: 'horizontal'
+            size_hint_x: 0.4
+            spacing: dp(5)
+
+            Button:
+                id: mute_btn
+                text: "🔇" if app.player.muted else "🔊"
+                on_release: app.toggle_mute()
+            Slider:
+                id: volume_slider
+                min: 0
+                max: 1
+                value: app.player.volume
+                on_value: app.set_volume(self.value)

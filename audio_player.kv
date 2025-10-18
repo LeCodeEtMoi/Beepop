@@ -1,0 +1,58 @@
+<RootWidget>:
+    orientation: "vertical"
+    spacing: 10
+    padding: 10
+
+    BoxLayout:
+        size_hint_y: None
+        height: 40
+        Button:
+            text: "▶️ Play/Pause"
+            on_release: app.toggle_play()
+        Button:
+            text: "⏹ Stop"
+            on_release: app.stop()
+        Button:
+            text: "🔍 Scan"
+            on_release: app.scan_music_folder()
+
+    Label:
+        id: current_track
+        text: "Aucune musique"
+        size_hint_y: None
+        height: 30
+
+    ScrollView:
+        size_hint_y: 0.5
+        GridLayout:
+            id: music_list
+            cols: 1
+            size_hint_y: None
+            height: self.minimum_height
+
+    Slider:
+        id: progress_slider
+        min: 0
+        max: 100
+        value: 0
+        size_hint_y: None
+        height: 40
+
+    BoxLayout:
+        size_hint_y: None
+        height: 30
+        Label:
+            id: elapsed
+            text: "00:00"
+        Label:
+            id: total
+            text: "00:00"
+
+    Slider:
+        id: volume_slider
+        min: 0
+        max: 1
+        value: 0.5
+        on_value: app.set_volume(self.value)
+        size_hint_y: None
+        height: 40
